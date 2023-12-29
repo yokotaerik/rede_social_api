@@ -6,61 +6,77 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 
+@Document
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
 
+    @Id
     private String id;
     private String username;
     private String email;
     private String password;
     private UserRole role;
-    private List<Post> posts;
-    private List<Comments> comments;
-    private Instant createdAt;
+    private List<Post> posts = new ArrayList<>();
+    private List<Comments> comments = new ArrayList<>();
+    private LocalDate createdAt;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public User(String id, String username, String email, String password, LocalDate createdAt) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = UserRole.USER;
+        this.createdAt = createdAt;
     }
 
     @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if(this.role == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+        else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+    @Override
     public String getPassword() {
-        return null;
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return this.username;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true; // Implemente a lógica conforme necessário
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true; // Implemente a lógica conforme necessário
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true; // Implemente a lógica conforme necessário
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true; // Implemente a lógica conforme necessário
     }
 }
