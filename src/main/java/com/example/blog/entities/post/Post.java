@@ -1,6 +1,7 @@
 package com.example.blog.entities.post;
 
 import com.example.blog.entities.user.User;
+import com.example.blog.entities.user.dtos.AuthorDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Document
 @Getter
@@ -20,6 +22,6 @@ public class Post implements Serializable {
     private String id;
     private String tittle;
     private String content;
-    private User author;
-    private Instant createdAt;
+    private AuthorDTO author;
+    private LocalDate createdAt;
 }
