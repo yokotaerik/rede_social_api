@@ -6,6 +6,7 @@ import com.example.blog.entities.user.User;
 import com.example.blog.entities.user.dtos.AuthorDTO;
 import com.example.blog.services.AuthService;
 import com.example.blog.services.PostService;
+import com.example.blog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,9 @@ public class PostController {
     @Autowired
     PostService postService;
 
+    @Autowired
+    UserService userService;
+
     @PostMapping("/create")
     public ResponseEntity create(@RequestBody CreatePostDTO data){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -41,9 +45,11 @@ public class PostController {
 
             LocalDate now = LocalDate.now();
 
-            Post post = new Post(data.id(), data.tittle(), data.content(), new AuthorDTO(user.getUsername()), now);
+            Post post = new Post(null, data.tittle(), data.content(), new AuthorDTO(user.getUsername()), now);
 
-            postService.create(post);
+            postService.create(post, user);
+
+
 
             return ResponseEntity.ok().body(post);
 

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,7 +33,11 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private UserRole role;
+
+    @DBRef(lazy = true)
     private List<Post> posts = new ArrayList<>();
+
+    @DBRef(lazy = true)
     private List<Comments> comments = new ArrayList<>();
     private LocalDate createdAt;
 

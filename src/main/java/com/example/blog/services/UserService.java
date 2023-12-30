@@ -1,5 +1,6 @@
 package com.example.blog.services;
 
+import com.example.blog.entities.post.Post;
 import com.example.blog.entities.user.User;
 import com.example.blog.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,12 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public User create(User user){
-        return userRepository.save(user);
+    public void save(User user){
+        userRepository.save(user);
+    }
+
+    public void create(User user){
+        userRepository.save(user);
     }
 
     public List<User> findAll(){
