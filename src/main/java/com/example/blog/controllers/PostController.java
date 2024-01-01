@@ -7,17 +7,17 @@ import com.example.blog.entities.user.dtos.AuthorDTO;
 import com.example.blog.services.AuthService;
 import com.example.blog.services.PostService;
 import com.example.blog.services.UserService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/post")
@@ -28,9 +28,6 @@ public class PostController {
 
     @Autowired
     PostService postService;
-
-    @Autowired
-    UserService userService;
 
     @PostMapping("/create")
     public ResponseEntity create(@RequestBody CreatePostDTO data){
@@ -45,7 +42,7 @@ public class PostController {
 
             LocalDate now = LocalDate.now();
 
-            Post post = new Post(null, data.tittle(), data.content(), new AuthorDTO(user.getUsername()), now);
+            Post post = new Post(null, data.tittle(), data.content(), new AuthorDTO(user.getUsername()), now, null);
 
             postService.create(post, user);
 
@@ -57,5 +54,23 @@ public class PostController {
 
         return  ResponseEntity.badRequest().build();
 
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity findAll(){
+        List<Post> posts = postService.findAll();
+
+        return ResponseEntity.ok().body(posts);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity findById(@PathVariable String id) {
+        Optional<Post> post = postService.findById(id);
+
+        if (post.isPresent()) {
+            return ResponseEntity.ok().body(post.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
