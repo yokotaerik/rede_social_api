@@ -24,7 +24,7 @@ import java.util.List;
 public class Post implements Serializable {
 
     private String id;
-    private String tittle;
+    private String title;
     private String content;
     private AuthorDTO author;
     private LocalDate createdAt;
