@@ -4,6 +4,7 @@ import com.example.blog.entities.user.User;
 import com.example.blog.entities.user.dtos.CreateUserDTO;
 import com.example.blog.entities.user.dtos.LoginDTO;
 import com.example.blog.entities.user.dtos.LoginResponseDTO;
+import com.example.blog.entities.user.dtos.UserInfo;
 import com.example.blog.infra.security.TokenService;
 import com.example.blog.services.AuthService;
 import com.example.blog.services.UserService;
@@ -12,13 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
@@ -82,5 +82,33 @@ public class AuthController {
                     .body("An unexpected error occurred");
         }
     }
+
+    @GetMapping("/me")
+    public ResponseEntity info() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User details not available");
+            }
+
+            User user = (User) authService.loadUserByUsername(userDetails.getUsername());
+
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User not found");
+            }
+
+            return ResponseEntity.ok().body(new UserInfo(user.getId(),user.getUsername(), user.getEmail()));
+        } catch (Exception e) {
+            // Log or handle the exception according to your needs
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing the request");
+        }
+    }
+
 
 }
