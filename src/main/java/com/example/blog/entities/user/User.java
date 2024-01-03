@@ -32,6 +32,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private UserRole role;
+    private String about = "";
 
     @DBRef(lazy = true)
     private List<Post> posts = new ArrayList<>();
