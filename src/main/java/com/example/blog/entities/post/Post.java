@@ -28,5 +28,6 @@ public class Post implements Serializable {
     private String content;
     private AuthorDTO author;
     private LocalDate createdAt;
+    private Integer like = 0;
     private List<CommentDTO> comments = new ArrayList<>();
 }
