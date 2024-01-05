@@ -1,7 +1,6 @@
 package com.example.blog.services;
 
 import com.example.blog.entities.comments.Comment;
-import com.example.blog.entities.comments.dtos.CommentDTO;
 import com.example.blog.entities.post.Post;
 import com.example.blog.entities.user.User;
 import com.example.blog.repositories.CommentRepository;
@@ -24,7 +23,7 @@ public class CommentService {
 
     public void create(Comment comment, Post post, User user){
         commentRepository.save(comment);
-        post.getComments().add(new CommentDTO(comment.getId(), user.getUsername(), comment.getContent()));
+        post.getComments().add(comment);
         postService.save(post);
         user.getComments().add(comment);
         userService.save(user);

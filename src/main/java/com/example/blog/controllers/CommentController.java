@@ -4,7 +4,6 @@ import com.example.blog.entities.comments.Comment;
 import com.example.blog.entities.comments.dtos.AddCommentDTO;
 import com.example.blog.entities.post.Post;
 import com.example.blog.entities.user.User;
-import com.example.blog.entities.user.dtos.UsernameDTO;
 import com.example.blog.services.AuthService;
 import com.example.blog.services.CommentService;
 import com.example.blog.services.PostService;
@@ -31,9 +30,8 @@ public class CommentController {
     @Autowired
     PostService postService;
 
-
     @PostMapping("/add/{postId}")
-    public ResponseEntity create(@RequestBody AddCommentDTO data, @PathVariable String postId) {
+    public ResponseEntity<String> create(@RequestBody AddCommentDTO data, @PathVariable String postId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication.isAuthenticated()) {
@@ -45,10 +43,10 @@ public class CommentController {
             if (postOptional.isPresent()) {
                 Post post = postOptional.get();
                 LocalDate now = LocalDate.now();
-                Comment comment = new Comment(null, data.content(), new UsernameDTO(user.getUsername()) , post.getId(), now);
+                Comment comment = new Comment(null, data.content(), user.getUsername(), post.getId(), now);
                 commentService.create(comment, post, user);
 
-                return ResponseEntity.ok().body(comment);
+                return ResponseEntity.ok().body("Comentário adicionado com sucesso.");
             }
         }
 

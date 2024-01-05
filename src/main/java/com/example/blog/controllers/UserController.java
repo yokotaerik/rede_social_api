@@ -31,7 +31,7 @@ public class UserController {
     public ResponseEntity findAll(@PathVariable String username) {
         User user = (User) authService.loadUserByUsername(username);
 
-        return ResponseEntity.ok().body(new UserInfo(user.getId(), user.getUsername(), user.getEmail(), user.getAbout(), user.getPosts()));
+        return ResponseEntity.ok().body(new UserInfo(user.getId(), user.getUsername(), user.getEmail(), user.getAbout(), user.getPosts(), user.getLikedPosts()));
     }
 
 

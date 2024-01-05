@@ -103,7 +103,7 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User not found");
             }
 
-            return ResponseEntity.ok().body(new UserInfo(user.getId(),user.getUsername(), user.getEmail(), user.getAbout(), user.getPosts()));
+            return ResponseEntity.ok().body(new UserInfo(user.getId(),user.getUsername(), user.getEmail(), user.getAbout(), user.getPosts(), user.getLikedPosts()));
         } catch (Exception e) {
             // Log or handle the exception according to your needs
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing the request");

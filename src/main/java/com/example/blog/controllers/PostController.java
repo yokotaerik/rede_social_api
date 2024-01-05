@@ -40,7 +40,7 @@ public class PostController {
 
             LocalDate now = LocalDate.now();
 
-            Post post = new Post(null, data.title(), data.content(), new UsernameDTO(user.getUsername()), now, null , null);
+            Post post = new Post(null, data.title(), data.content(),user.getUsername(), now, null , null);
 
             postService.create(post, user);
 

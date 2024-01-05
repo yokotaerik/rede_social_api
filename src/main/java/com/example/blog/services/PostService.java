@@ -35,11 +35,11 @@ public class PostService {
 
     public void likeOrDislike(Post post, User user){
 
-        if(post.getLikes().contains(new UsernameDTO(user.getUsername()))){
-            post.getLikes().remove(new UsernameDTO(user.getUsername()));
+        if(post.getLikes().contains(user.getUsername())){
+            post.getLikes().remove(user.getUsername());
             user.getLikedPosts().remove(post);
         } else {
-            post.getLikes().add(new UsernameDTO(user.getUsername()));
+            post.getLikes().add(user.getUsername());
             user.getLikedPosts().add(post);
         }
 
