@@ -2,6 +2,7 @@ package com.example.blog.services;
 
 import com.example.blog.entities.post.Post;
 import com.example.blog.entities.user.User;
+import com.example.blog.entities.user.dtos.UsernameDTO;
 import com.example.blog.repositories.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,4 +32,19 @@ public class PostService {
     public Optional<Post> findById(String id) { return postRepository.findById(id); }
 
     public void save(Post post) {  postRepository.save(post); }
+
+    public void likeOrDislike(Post post, User user){
+
+        if(post.getLikes().contains(new UsernameDTO(user.getUsername()))){
+            post.getLikes().remove(new UsernameDTO(user.getUsername()));
+            user.getLikedPosts().remove(post);
+        } else {
+            post.getLikes().add(new UsernameDTO(user.getUsername()));
+            user.getLikedPosts().add(post);
+        }
+
+        save(post);
+        userService.save(user);
+
+    }
 }

@@ -1,4 +1,4 @@
 package com.example.blog.entities.user.dtos;
 
-public record AuthorDTO(String username) {
+public record UsernameDTO(String username) {
 }

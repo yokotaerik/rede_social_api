@@ -3,11 +3,9 @@ package com.example.blog.controllers;
 import com.example.blog.entities.post.Post;
 import com.example.blog.entities.post.dtos.CreatePostDTO;
 import com.example.blog.entities.user.User;
-import com.example.blog.entities.user.dtos.AuthorDTO;
+import com.example.blog.entities.user.dtos.UsernameDTO;
 import com.example.blog.services.AuthService;
 import com.example.blog.services.PostService;
-import com.example.blog.services.UserService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -42,7 +40,7 @@ public class PostController {
 
             LocalDate now = LocalDate.now();
 
-            Post post = new Post(null, data.title(), data.content(), new AuthorDTO(user.getUsername()), now, null, null);
+            Post post = new Post(null, data.title(), data.content(), new UsernameDTO(user.getUsername()), now, null , null);
 
             postService.create(post, user);
 
@@ -73,4 +71,30 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping("/like/{postId}")
+    public ResponseEntity likeOrDislike(@PathVariable String postId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            try {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                String username = userDetails.getUsername();
+                User user = (User) authService.loadUserByUsername(username);
+
+                Optional<Post> postOptional = postService.findById(postId);
+
+                postService.likeOrDislike(postOptional.get(), user);
+
+
+
+                return ResponseEntity.ok("Like operation successful.");
+            } catch (Exception e) {
+                return ResponseEntity.status(500).body("Error during like operation: " + e.getMessage());
+            }
+        } else {
+            return ResponseEntity.status(401).body("User not authenticated.");
+        }
+    }
 }
+

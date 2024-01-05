@@ -35,6 +35,9 @@ public class User implements UserDetails {
     private String about = "";
 
     @DBRef(lazy = true)
+    private List<Post> likedPosts = new ArrayList<>();
+
+    @DBRef(lazy = true)
     private List<Post> posts = new ArrayList<>();
 
     @DBRef(lazy = true)
