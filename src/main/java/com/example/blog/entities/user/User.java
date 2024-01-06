@@ -33,6 +33,12 @@ public class User implements UserDetails {
     private String about = "";
 
     @DBRef(lazy = true)
+    private List<User> followers = new ArrayList<>();
+
+    @DBRef(lazy = true)
+    private List<User> following = new ArrayList<>();
+
+    @DBRef(lazy = true)
     private List<Post> likedPosts = new ArrayList<>();
 
     @DBRef(lazy = true)
@@ -49,6 +55,22 @@ public class User implements UserDetails {
         this.password = password;
         this.role = UserRole.USER;
         this.createdAt = createdAt;
+    }
+
+    public void addFollower(User follower) {
+        followers.add(follower);
+    }
+
+    public void removeFollower(User follower) {
+        followers.remove(follower);
+    }
+
+    public void addFollowing(User followed) {
+        following.add(followed);
+    }
+
+    public void removeFollowing(User followed) {
+        following.remove(followed);
     }
 
     @Override

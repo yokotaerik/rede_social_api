@@ -21,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/auth")
@@ -103,7 +104,8 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User not found");
             }
 
-            return ResponseEntity.ok().body(new UserInfo(user.getId(),user.getUsername(), user.getEmail(), user.getAbout(), user.getPosts(), user.getLikedPosts()));
+            return ResponseEntity.ok().body(new UserInfo(user.getId(),user.getUsername(), user.getEmail(), user.getAbout(), user.getPosts(), user.getLikedPosts(),  user.getFollowers().stream().map(User::getUsername).collect(Collectors.toList()),
+                    user.getFollowing().stream().map(User::getUsername).collect(Collectors.toList())));
         } catch (Exception e) {
             // Log or handle the exception according to your needs
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing the request");

@@ -28,4 +28,20 @@ public class UserService {
     public List<User> findAll(){
         return userRepository.findAll();
     }
+
+    public void follow(User follower, User followed) {
+
+        if (followed.getFollowers().contains(follower)) {
+            followed.removeFollower(follower);
+            follower.removeFollowing(followed);
+        } else {
+            follower.addFollowing(followed);
+            followed.addFollower(follower);
+        }
+
+        save(followed);
+        save(follower);
+    }
+
+
 }

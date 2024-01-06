@@ -3,7 +3,6 @@ package com.example.blog.controllers;
 import com.example.blog.entities.post.Post;
 import com.example.blog.entities.post.dtos.CreatePostDTO;
 import com.example.blog.entities.user.User;
-import com.example.blog.entities.user.dtos.UsernameDTO;
 import com.example.blog.services.AuthService;
 import com.example.blog.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,62 +17,51 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/post")
+@RequestMapping("/post")
 public class PostController {
 
     @Autowired
-    AuthService authService;
+    private AuthService authService;
 
     @Autowired
-    PostService postService;
+    private PostService postService;
 
     @PostMapping("/create")
-    public ResponseEntity create(@RequestBody CreatePostDTO data){
+    public ResponseEntity<Post> create(@RequestBody CreatePostDTO data) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication.isAuthenticated()) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
             String username = userDetails.getUsername();
-
             User user = (User) authService.loadUserByUsername(username);
 
             LocalDate now = LocalDate.now();
-
-            Post post = new Post(null, data.title(), data.content(),user.getUsername(), now, null , null);
+            Post post = new Post(null, data.title(), data.content(), user.getUsername(), now, null, null);
 
             postService.create(post, user);
 
-
-
-            return ResponseEntity.ok().body(post);
-
+            return ResponseEntity.ok(post);
         }
 
-        return  ResponseEntity.badRequest().build();
-
+        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/all")
-    public ResponseEntity findAll(){
+    public ResponseEntity<List<Post>> findAll() {
         List<Post> posts = postService.findAll();
-
-        return ResponseEntity.ok().body(posts);
+        return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity findById(@PathVariable String id) {
+    public ResponseEntity<Post> findById(@PathVariable String id) {
         Optional<Post> post = postService.findById(id);
 
-        if (post.isPresent()) {
-            return ResponseEntity.ok().body(post.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return post.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/like/{postId}")
-    public ResponseEntity likeOrDislike(@PathVariable String postId) {
+    public ResponseEntity<String> likeOrDislike(@PathVariable String postId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
@@ -84,9 +72,7 @@ public class PostController {
 
                 Optional<Post> postOptional = postService.findById(postId);
 
-                postService.likeOrDislike(postOptional.get(), user);
-
-
+                postService.likeOrDislike(postOptional.orElseThrow(), user);
 
                 return ResponseEntity.ok("Like operation successful.");
             } catch (Exception e) {
@@ -97,4 +83,3 @@ public class PostController {
         }
     }
 }
-
