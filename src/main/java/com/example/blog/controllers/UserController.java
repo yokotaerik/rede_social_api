@@ -1,5 +1,6 @@
 package com.example.blog.controllers;
 
+import com.example.blog.entities.post.Post;
 import com.example.blog.entities.user.User;
 import com.example.blog.entities.user.dtos.UserInfo;
 import com.example.blog.services.AuthService;
@@ -33,7 +34,7 @@ public class UserController {
     @GetMapping("/{username}")
     public ResponseEntity<UserInfo> findByUsername(@PathVariable String username) {
         User user = (User) authService.loadUserByUsername(username);
-        UserInfo userInfo = new UserInfo(user.getId(), user.getUsername(), user.getEmail(), user.getAbout(), user.getPosts(), user.getLikedPosts(),  user.getFollowers().stream().map(User::getUsername).collect(Collectors.toList()),
+        UserInfo userInfo = new UserInfo(user.getId(), user.getUsername(), user.getEmail(), user.getAbout(), user.getPosts(), user.getLikedPosts(), user.getFollowers().stream().map(User::getUsername).collect(Collectors.toList()),
                 user.getFollowing().stream().map(User::getUsername).collect(Collectors.toList()));
         return ResponseEntity.ok(userInfo);
     }
@@ -58,5 +59,20 @@ public class UserController {
         } else {
             return ResponseEntity.status(401).body("User not authenticated.");
         }
+    }
+
+    @GetMapping("/feed")
+    public ResponseEntity getFeed() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String username = userDetails.getUsername();
+            User user = (User) authService.loadUserByUsername(username);
+            List<Post> feed = userService.getFeed(user);
+            return ResponseEntity.ok(feed);
+        }
+
+        return ResponseEntity.status(401).body(null);
     }
 }

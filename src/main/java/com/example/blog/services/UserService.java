@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -41,6 +42,15 @@ public class UserService {
 
         save(followed);
         save(follower);
+    }
+
+    public List<Post> getFeed(User user){
+        List<User> following = user.getFollowing();
+
+        return following
+                .stream()
+                .flatMap(u -> u.getPosts().stream())
+                .collect(Collectors.toList());
     }
 
 
