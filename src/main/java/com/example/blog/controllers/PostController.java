@@ -2,7 +2,9 @@ package com.example.blog.controllers;
 
 import com.example.blog.entities.post.Post;
 import com.example.blog.entities.post.dtos.CreatePostDTO;
+import com.example.blog.entities.post.dtos.PostDTO;
 import com.example.blog.entities.user.User;
+import com.example.blog.mappers.PostMapper;
 import com.example.blog.services.AuthService;
 import com.example.blog.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,19 +17,25 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/post")
 public class PostController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final PostService postService;
+    private final PostMapper postMapper;
 
     @Autowired
-    private PostService postService;
+    public PostController(AuthService authService, PostService postService, PostMapper postMapper) {
+        this.authService = authService;
+        this.postService = postService;
+        this.postMapper = postMapper;
+    }
 
     @PostMapping("/create")
-    public ResponseEntity<Post> create(@RequestBody CreatePostDTO data) {
+    public ResponseEntity<String> create(@RequestBody CreatePostDTO data) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication.isAuthenticated()) {
@@ -36,50 +44,29 @@ public class PostController {
             User user = (User) authService.loadUserByUsername(username);
 
             LocalDate now = LocalDate.now();
-            Post post = new Post(null, data.title(), data.content(), user.getUsername(), now, null, null);
+            Post post = new Post(null, data.title(), data.content(), user, now, null, null);
 
             postService.create(post, user);
 
-            return ResponseEntity.ok(post);
+            return ResponseEntity.ok("Successfully requested");
         }
 
         return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Post>> findAll() {
+    public ResponseEntity<List<PostDTO>> findAll() {
         List<Post> posts = postService.findAll();
-        return ResponseEntity.ok(posts);
+        List<PostDTO> postDTOs = posts.stream().map(postMapper::toDTO).collect(Collectors.toList());
+
+        return ResponseEntity.ok(postDTOs);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> findById(@PathVariable String id) {
+    public ResponseEntity<PostDTO> findById(@PathVariable String id) {
         Optional<Post> post = postService.findById(id);
 
-        return post.map(ResponseEntity::ok)
+        return post.map(p -> ResponseEntity.ok(postMapper.toDTO(p)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/like/{postId}")
-    public ResponseEntity<String> likeOrDislike(@PathVariable String postId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            try {
-                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                String username = userDetails.getUsername();
-                User user = (User) authService.loadUserByUsername(username);
-
-                Optional<Post> postOptional = postService.findById(postId);
-
-                postService.likeOrDislike(postOptional.orElseThrow(), user);
-
-                return ResponseEntity.ok("Like operation successful.");
-            } catch (Exception e) {
-                return ResponseEntity.status(500).body("Error during like operation: " + e.getMessage());
-            }
-        } else {
-            return ResponseEntity.status(401).body("User not authenticated.");
-        }
     }
 }

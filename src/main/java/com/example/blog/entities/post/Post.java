@@ -1,6 +1,7 @@
 package com.example.blog.entities.post;
 
 import com.example.blog.entities.comments.Comment;
+import com.example.blog.entities.user.User;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,12 +22,13 @@ public class Post implements Serializable {
     private String id;
     private String title;
     private String content;
-    private String author;
+
+    @DBRef(lazy = true)
+    private User author;
     private LocalDate createdAt;
 
-    private List<String> likes = new ArrayList<>();
-
-
+    @DBRef(lazy = true)
+    private List<User> likes = new ArrayList<>();
     @DBRef(lazy = true)
     private List<Comment> comments = new ArrayList<>();
 }

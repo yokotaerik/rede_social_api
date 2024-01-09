@@ -18,17 +18,19 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/comment")
+@RequestMapping("/comment")
 public class CommentController {
 
-    @Autowired
-    CommentService commentService;
+    private final CommentService commentService;
+    private final AuthService authService;
+    private final PostService postService;
 
     @Autowired
-    AuthService authService;
-
-    @Autowired
-    PostService postService;
+    public CommentController(CommentService commentService, AuthService authService, PostService postService) {
+        this.commentService = commentService;
+        this.authService = authService;
+        this.postService = postService;
+    }
 
     @PostMapping("/add/{postId}")
     public ResponseEntity<String> create(@RequestBody AddCommentDTO data, @PathVariable String postId) {
@@ -43,10 +45,10 @@ public class CommentController {
             if (postOptional.isPresent()) {
                 Post post = postOptional.get();
                 LocalDate now = LocalDate.now();
-                Comment comment = new Comment(null, data.content(), user.getUsername(), post.getId(), now);
+                Comment comment = new Comment(null, data.content(), user, post, now);
                 commentService.create(comment, post, user);
 
-                return ResponseEntity.ok().body("Comentário adicionado com sucesso.");
+                return ResponseEntity.ok("Successfully requested.");
             }
         }
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CommentService {
@@ -29,7 +30,26 @@ public class CommentService {
         userService.save(user);
     }
 
+    public void save(Comment comment){ commentRepository.save(comment); }
+
     public List<Comment> findAll(){
         return commentRepository.findAll();
+    }
+
+    public Optional<Comment> findById(String id) { return  commentRepository.findById(id);}
+
+    public void likeOrDislike(Comment comment, User user){
+
+        if(comment.getLikes().contains(user)){
+            comment.getLikes().remove(user);
+            user.getLikedComments().remove(comment);
+        } else {
+            comment.getLikes().add(user);
+            user.getLikedComments().add(comment);
+        }
+
+        save(comment);
+        userService.save(user);
+
     }
 }

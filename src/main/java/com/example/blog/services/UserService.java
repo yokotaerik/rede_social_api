@@ -53,5 +53,9 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public List<User> findUsersByUsername(String username){
+        return userRepository.findByRegexInUsername(username);
+    }
+
 
 }

@@ -1,8 +1,12 @@
 package com.example.blog.controllers;
 
 import com.example.blog.entities.post.Post;
+import com.example.blog.entities.post.dtos.PostDTO;
 import com.example.blog.entities.user.User;
+import com.example.blog.entities.user.dtos.AboutMeDTO;
 import com.example.blog.entities.user.dtos.UserInfo;
+import com.example.blog.mappers.PostMapper;
+import com.example.blog.mappers.UserMapper;
 import com.example.blog.services.AuthService;
 import com.example.blog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +19,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final AuthService authService;
+    private final UserMapper userMapper;
+    private final PostMapper postMapper;
 
     @Autowired
-    private AuthService authService;
+    public UserController(UserService userService, AuthService authService, UserMapper userMapper, PostMapper postMapper) {
+        this.userService = userService;
+        this.authService = authService;
+        this.userMapper = userMapper;
+        this.postMapper = postMapper;
+    }
 
     @GetMapping
     public ResponseEntity<List<User>> findAll() {
@@ -34,8 +46,7 @@ public class UserController {
     @GetMapping("/{username}")
     public ResponseEntity<UserInfo> findByUsername(@PathVariable String username) {
         User user = (User) authService.loadUserByUsername(username);
-        UserInfo userInfo = new UserInfo(user.getId(), user.getUsername(), user.getEmail(), user.getAbout(), user.getPosts(), user.getLikedPosts(), user.getFollowers().stream().map(User::getUsername).collect(Collectors.toList()),
-                user.getFollowing().stream().map(User::getUsername).collect(Collectors.toList()));
+        UserInfo userInfo = userMapper.toUserInfo(user);
         return ResponseEntity.ok(userInfo);
     }
 
@@ -62,17 +73,42 @@ public class UserController {
     }
 
     @GetMapping("/feed")
-    public ResponseEntity getFeed() {
+    public ResponseEntity<List<PostDTO>> getFeed() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String username = userDetails.getUsername();
             User user = (User) authService.loadUserByUsername(username);
-            List<Post> feed = userService.getFeed(user);
+            List<Post> posts = userService.getFeed(user);
+            List<PostDTO> feed = posts.stream().map(postMapper::toDTO).collect(Collectors.toList());
+
             return ResponseEntity.ok(feed);
         }
 
         return ResponseEntity.status(401).body(null);
+    }
+
+    @PatchMapping("/about")
+    public ResponseEntity<String> patchAboutMe(@RequestBody AboutMeDTO data) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String username = userDetails.getUsername();
+            User user = (User) authService.loadUserByUsername(username);
+            user.setAbout(data.about());
+            userService.save(user);
+        }
+        return ResponseEntity.ok().body("Successfully request");
+    }
+
+    @GetMapping("/find/{username}")
+    public ResponseEntity<List<String>> findUsersByUsername(@PathVariable String username){
+        List<User> users = userService.findUsersByUsername(username);
+
+        List<String> names = users.stream().map(User::getUsername).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(names);
     }
 }
