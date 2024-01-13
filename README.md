@@ -1,42 +1,55 @@
-Projeto de Yomaik
-Uma aplicação de rede social desenvolvida usando Java com Spring Boot no backend, MongoDB como banco de dados e React no frontend. O projeto foi inspirado em plataformas de microblogging como Twitter, proporcionando uma experiência interativa para os usuários compartilharem pensamentos, postarem atualizações e se conectarem uns com os outros.
+# Projeto Yomaik - Rede Social
 
-Funcionalidades
-Cadastro e Autenticação de Usuários:
+Yomaik é uma aplicação de rede social desenvolvida com o objetivo de proporcionar uma experiência interativa para os usuários compartilharem pensamentos, postarem atualizações e se conectarem uns com os outros. O projeto foi inspirado em plataformas de microblogging como o Twitter.
 
-Os usuários podem se cadastrar na plataforma e fazer login de forma segura.
-Criação de Posts:
-Os usuários podem criar e publicar posts, compartilhando seus pensamentos e atualizações com a comunidade, também e possivel deletar os comentários e posts.
+## Motivação
 
-Comentários e Curtidas:
-Os usuários podem interagir com os posts por meio de comentários e curtidas, promovendo engajamento.
+A principal motivação por trás do desenvolvimento do Yomaik foi aprofundar conhecimentos em Spring e Java, explorando também a utilização do MongoDB como um banco de dados NoSQL. A busca por uma compreensão mais profunda dessas tecnologias impulsionou a criação desta plataforma de rede social.
 
-Seguindo e Seguidores:
-Os usuários têm a capacidade de seguir outros usuários e serem seguidos, construindo uma rede de conexões.
+## Funcionalidades
 
-Feed Personalizado:
-O feed principal exibe posts dos usuários que você está seguindo, proporcionando uma experiência personalizada.
+### Cadastro e Autenticação de Usuários
 
-Tecnologias Utilizadas
-Backend
-Java Spring Boot:
+- Os usuários podem se cadastrar de forma segura.
+- Login seguro para acesso à plataforma.
 
-Framework robusto para desenvolvimento rápido e eficiente em Java.
-MongoDB:
+### Criação de Posts
 
-Banco de dados NoSQL para armazenar dados de forma flexível e escalável.
-Spring Security:
+- Os usuários podem criar e publicar posts, compartilhando seus pensamentos e atualizações.
+- Possibilidade de deletar comentários e posts.
 
-Para autenticação e autorização seguras.
+### Comentários e Curtidas
 
-Frontend
-React:
-Biblioteca JavaScript para construção de interfaces de usuário interativas.
+- Interação através de comentários e curtidas, promovendo engajamento.
 
-Axios:
-Biblioteca para fazer requisições HTTP ao backend.
+### Seguindo e Seguidores
 
-Tailwind:
-Para estilização das paginas
+- Os usuários têm a capacidade de seguir outros usuários e serem seguidos, construindo uma rede de conexões.
 
-Divirta-se construindo conexões!
+### Feed Personalizado
+
+- O feed principal exibe posts dos usuários seguidos, proporcionando uma experiência personalizada.
+
+## Tecnologias Utilizadas
+
+### Backend
+
+- **Java Spring Boot:**
+  - Framework robusto para desenvolvimento rápido e eficiente em Java.
+- **MongoDB:**
+  - Banco de dados NoSQL para armazenar dados de forma flexível e escalável.
+- **Spring Security:**
+  - Para autenticação e autorização seguras.
+
+### Frontend
+
+- **React:**
+  - Biblioteca JavaScript para construção de interfaces de usuário interativas.
+- **Axios:**
+  - Biblioteca para fazer requisições HTTP ao backend.
+- **Tailwind:**
+  - Para estilização das páginas.
+
+## Divirta-se construindo conexões!
+
+Sinta-se à vontade para explorar, contribuir e construir uma comunidade envolvente no Yomaik. Boas conexões!
