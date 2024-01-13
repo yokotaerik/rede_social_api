@@ -52,4 +52,23 @@ public class CommentService {
         userService.save(user);
 
     }
+
+    public void delete(Comment comment) {
+
+        comment.getAuthor().getComments().remove(comment);
+        userService.save(comment.getAuthor());
+
+        comment.getPost().getComments().remove(comment);
+        postService.save(comment.getPost());
+
+        List<User> likesOnComment = comment.getLikes();
+        for(User user : likesOnComment){
+            user.getLikedComments().remove(comment);
+            userService.save(user);
+        }
+
+
+        commentRepository.delete(comment);
+    }
+
 }
