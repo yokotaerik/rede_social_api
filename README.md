@@ -4,7 +4,7 @@ Yomaik é uma aplicação de rede social desenvolvida com o objetivo de proporci
 
 ## Motivação
 
-A principal motivação por trás do desenvolvimento do Yomaik foi aprofundar conhecimentos em Spring e Java, explorando também a utilização do MongoDB como um banco de dados NoSQL. A busca por uma compreensão mais profunda dessas tecnologias impulsionou a criação desta plataforma de rede social.
+A principal motivação por trás do desenvolvimento do Yomaik foi aprofundar conhecimentos em Spring e Java colocando meus conhecimentos em prática sendo minha priemira aplicalação desenvolvida nessa tecnologia, explorando também a utilização do MongoDB como um banco de dados NoSQL. A busca por uma compreensão mais profunda dessas tecnologias impulsionou a criação desta plataforma de rede social.
 
 ## Funcionalidades
 
