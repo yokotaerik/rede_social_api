@@ -5,6 +5,7 @@ import com.example.blog.entities.user.dtos.CreateUserDTO;
 import com.example.blog.entities.user.dtos.LoginDTO;
 import com.example.blog.entities.user.dtos.LoginResponseDTO;
 import com.example.blog.entities.user.dtos.UserInfo;
+import com.example.blog.infra.security.TokenService;
 import com.example.blog.mappers.UserMapper;
 import com.example.blog.services.AuthService;
 import com.example.blog.services.UserService;
@@ -12,6 +13,9 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,6 +26,13 @@ public class AuthController {
     private final UserService userService;
     private final AuthService authService;
     private final UserMapper userMapper;
+
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    TokenService tokenService;
 
     @Autowired
     public AuthController(UserService userService, AuthService authService, UserMapper userMapper) {
@@ -38,14 +49,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginDTO credentials) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO credentials) {
+        try {
+            // Verifica as credenciais, se forem validas ele envia o token, caso contrário retorna um unauthorized
+            var usernamePassword = new UsernamePasswordAuthenticationToken(credentials.username(), credentials.password());
+            var auth = authenticationManager.authenticate(usernamePassword);
+            var token = tokenService.generateToken((User) auth.getPrincipal());
 
-        String token = authService.authenticateUser(credentials);
-
-        if(token != null ){
             return ResponseEntity.ok(new LoginResponseDTO(token));
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponseDTO(""));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("");
         }
     }
 
