@@ -2,10 +2,14 @@ package com.example.blog.services;
 
 import com.example.blog.entities.post.Post;
 import com.example.blog.entities.user.User;
+import com.example.blog.entities.user.dtos.CreateUserDTO;
 import com.example.blog.repositories.UserRepository;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,7 +24,23 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void create(User user){
+    public void create(CreateUserDTO data) throws BadRequestException {
+
+        if(userRepository.findByEmail(data.email()) != null){
+            throw new BadRequestException("Email already exists");
+        }
+
+        if(userRepository.findByUsername(data.username()) != null){
+            throw new BadRequestException("Username already exists");
+        }
+
+        LocalDate now = LocalDate.now();
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+
+
+        User user = new User(data.id(), data.username(), data.email(), encryptedPassword, now);
+
+
         userRepository.save(user);
     }
 
