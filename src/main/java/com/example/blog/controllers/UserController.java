@@ -50,7 +50,6 @@ public class UserController {
     @PostMapping("/follow/{usernameFollowed}")
     public ResponseEntity<String> follow(@PathVariable String usernameFollowed) throws Exception {
         User follower = authService.getCurrentUser();
-        String usernameFollower = follower.getUsername();
         User followed = (User) authService.loadUserByUsername(usernameFollowed);
 
         userService.follow(follower, followed);

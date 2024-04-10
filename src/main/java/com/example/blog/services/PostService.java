@@ -5,7 +5,6 @@ import com.example.blog.entities.post.Post;
 import com.example.blog.entities.post.dtos.CreatePostDTO;
 import com.example.blog.entities.user.User;
 import com.example.blog.entities.user.UserRole;
-import com.example.blog.entities.user.dtos.UsernameDTO;
 import com.example.blog.exceptions.EntityNotFoundException;
 import com.example.blog.repositories.CommentRepository;
 import com.example.blog.repositories.PostRepository;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostService {
