@@ -31,4 +31,11 @@ public class Post implements Serializable {
     private List<User> likes = new ArrayList<>();
     @DBRef(lazy = true)
     private List<Comment> comments = new ArrayList<>();
+
+    public Post(String title, String content, User author, LocalDate createdAt) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.createdAt = createdAt;
+    }
 }

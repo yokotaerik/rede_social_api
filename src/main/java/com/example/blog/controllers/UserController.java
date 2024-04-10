@@ -11,9 +11,6 @@ import com.example.blog.services.AuthService;
 import com.example.blog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,56 +48,32 @@ public class UserController {
     }
 
     @PostMapping("/follow/{usernameFollowed}")
-    public ResponseEntity<String> follow(@PathVariable String usernameFollowed) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<String> follow(@PathVariable String usernameFollowed) throws Exception {
+        User follower = authService.getCurrentUser();
+        String usernameFollower = follower.getUsername();
+        User followed = (User) authService.loadUserByUsername(usernameFollowed);
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            try {
-                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                String usernameFollower = userDetails.getUsername();
-                User follower = (User) authService.loadUserByUsername(usernameFollower);
-                User followed = (User) authService.loadUserByUsername(usernameFollowed);
+        userService.follow(follower, followed);
 
-                userService.follow(follower, followed);
-
-                return ResponseEntity.ok("Follow operation successful.");
-            } catch (Exception e) {
-                return ResponseEntity.status(500).body("Error during follow operation: " + e.getMessage());
-            }
-        } else {
-            return ResponseEntity.status(401).body("User not authenticated.");
-        }
+        return ResponseEntity.ok("Follow operation successful.");
     }
 
     @GetMapping("/feed")
-    public ResponseEntity<List<PostDTO>> getFeed() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<List<PostDTO>> getFeed() throws Exception {
+        User user = authService.getCurrentUser();
+        List<Post> posts = userService.getFeed(user);
+        List<PostDTO> feed = posts.stream().map(postMapper::toDTO).collect(Collectors.toList());
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String username = userDetails.getUsername();
-            User user = (User) authService.loadUserByUsername(username);
-            List<Post> posts = userService.getFeed(user);
-            List<PostDTO> feed = posts.stream().map(postMapper::toDTO).collect(Collectors.toList());
-
-            return ResponseEntity.ok(feed);
-        }
-
-        return ResponseEntity.status(401).body(null);
+        return ResponseEntity.ok(feed);
     }
 
     @PatchMapping("/about")
-    public ResponseEntity<String> patchAboutMe(@RequestBody AboutMeDTO data) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<String> patchAboutMe(@RequestBody AboutMeDTO data) throws Exception {
+        User user = authService.getCurrentUser();
+        user.setAbout(data.about());
+        userService.save(user);
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String username = userDetails.getUsername();
-            User user = (User) authService.loadUserByUsername(username);
-            user.setAbout(data.about());
-            userService.save(user);
-        }
-        return ResponseEntity.ok().body("Successfully request");
+        return ResponseEntity.ok().body("About me updated successfully.");
     }
 
     @GetMapping("/find/{username}")

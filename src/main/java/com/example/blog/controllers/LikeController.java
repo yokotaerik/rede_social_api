@@ -8,15 +8,11 @@ import com.example.blog.services.CommentService;
 import com.example.blog.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/like")
@@ -34,32 +30,17 @@ public class LikeController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<String> likeOrDislike(@PathVariable String id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<String> likeOrDislike(@PathVariable String id) throws Exception {
+                User user = authService.getCurrentUser();
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            try {
-                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                String username = userDetails.getUsername();
-                User user = (User) authService.loadUserByUsername(username);
+                Post post = postService.findById(id);
+                Comment comment = commentService.findById(id);
 
-                Optional<Post> postOptional = postService.findById(id);
-                Optional<Comment> commentOptional = commentService.findById(id);
 
-                if (postOptional.isEmpty() && commentOptional.isEmpty()) {
-                    return ResponseEntity.status(404).body("Neither post nor comment found with ID: " + id);
-                }
-
-                postOptional.ifPresent(post -> postService.likeOrDislike(post, user));
-                commentOptional.ifPresent(comment -> commentService.likeOrDislike(comment, user));
+                postService.likeOrDislike(post, user);
+                commentService.likeOrDislike(comment, user);
 
                 return ResponseEntity.ok("Like operation successful.");
-            } catch (Exception e) {
-                return ResponseEntity.status(500).body("Error during like operation: " + e.getMessage());
-            }
-        } else {
-            return ResponseEntity.status(401).body("User not authenticated.");
         }
-    }
 }
 

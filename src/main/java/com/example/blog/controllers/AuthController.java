@@ -26,19 +26,16 @@ public class AuthController {
     private final UserService userService;
     private final AuthService authService;
     private final UserMapper userMapper;
-
-
-    @Autowired
-    AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
     @Autowired
-    TokenService tokenService;
-
-    @Autowired
-    public AuthController(UserService userService, AuthService authService, UserMapper userMapper) {
+    public AuthController(AuthenticationManager authenticationManager, TokenService tokenService, UserService userService, AuthService authService, UserMapper userMapper) {
         this.userService = userService;
         this.authService = authService;
         this.userMapper = userMapper;
+        this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/register")
@@ -58,7 +55,7 @@ public class AuthController {
 
             return ResponseEntity.ok(new LoginResponseDTO(token));
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Cannot authenticate user ");
         }
     }
 
