@@ -1,11 +1,8 @@
 package com.example.blog.controllers;
 
-import com.example.blog.entities.comments.Comment;
-import com.example.blog.entities.post.Post;
 import com.example.blog.entities.user.User;
 import com.example.blog.services.AuthService;
-import com.example.blog.services.CommentService;
-import com.example.blog.services.PostService;
+import com.example.blog.services.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,28 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class LikeController {
 
     private final AuthService authService;
-    private final PostService postService;
-    private final CommentService commentService;
+    private final LikeService likeService;
 
     @Autowired
-    public LikeController(AuthService authService, PostService postService, CommentService commentService) {
+    public LikeController(AuthService authService, LikeService likeService) {
         this.authService = authService;
-        this.postService = postService;
-        this.commentService = commentService;
+        this.likeService = likeService;
     }
 
     @PostMapping("/{id}")
     public ResponseEntity<String> likeOrDislike(@PathVariable String id) throws Exception {
-                User user = authService.getCurrentUser();
+        User user = authService.getCurrentUser();
+        likeService.LikeOrDislike(id, user);
 
-                Post post = postService.findById(id);
-                Comment comment = commentService.findById(id);
-
-
-                postService.likeOrDislike(post, user);
-                commentService.likeOrDislike(comment, user);
-
-                return ResponseEntity.ok("Like operation successful.");
-        }
+        return ResponseEntity.ok("Successfully liked/disliked");
+    }
 }
 
