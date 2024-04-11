@@ -24,7 +24,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void create(CreateUserDTO data) throws BadRequestException {
+    public User create(CreateUserDTO data) throws BadRequestException {
 
         if(userRepository.findByEmail(data.email()) != null){
             throw new BadRequestException("Email already exists");
@@ -37,11 +37,11 @@ public class UserService {
         LocalDate now = LocalDate.now();
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
 
-
         User user = new User(data.id(), data.username(), data.email(), encryptedPassword, now);
 
-
         userRepository.save(user);
+
+        return user;
     }
 
     public Optional<User> findById(String id) { return userRepository.findById(id); }
