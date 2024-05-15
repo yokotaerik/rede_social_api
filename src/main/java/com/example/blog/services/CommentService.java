@@ -28,8 +28,6 @@ public class CommentService {
 
     public void create(AddCommentDTO data, Post post, User user){
 
-
-
         LocalDate now = LocalDate.now();
         Comment comment = new Comment(null, data.content(), user, post, now);
 
